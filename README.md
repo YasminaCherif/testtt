@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 93f2de323a79c3a3dd5c5327a9d34d878f551fb4
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
@@ -78,6 +81,9 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+<<<<<<< HEAD
 =======
 # Projet_Mobile
 >>>>>>> f63e336285cb30cf21a3710f7d587dcfdad2c8ff
+=======
+>>>>>>> 93f2de323a79c3a3dd5c5327a9d34d878f551fb4

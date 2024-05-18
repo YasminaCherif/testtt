@@ -41,6 +41,46 @@
           ]
         }
       }
+<<<<<<< HEAD
+=======
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869924086974:android:3c4d37f49c2f2c56532aef",
+        "android_client_info": {
+          "package_name": "com.chehiwatbinidikapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "869924086974-1ngtt5ip1ssnkb3st03i7kvi1nm1bh5n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chehiwatbinidikapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "869924086974-o47pk711o6qkddo40nem6p4q2h9skg3i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAFXUc6NfcBzC7SSQ1w99BzUZl6xu6RVI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "869924086974-o47pk711o6qkddo40nem6p4q2h9skg3i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+>>>>>>> 93f2de323a79c3a3dd5c5327a9d34d878f551fb4
     }
   ],
   "configuration_version": "1"
