@@ -1,26 +1,8 @@
 import React from 'react';
 import { View, ImageBackground, Image, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import LoginScreen from './screens/LoginScreen';
-import WelcomeScreen from './screens/WelcomeScreen';
-import SignInScreen from './screens/SignInScreen';
-import myImage from './asset/images/img.png';
-import myImage2 from './asset/images/Logo2.png';
-
-const Stack = createStackNavigator();
-
-const MainContainer = () => {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Main" component={MainScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      <Stack.Screen name="SignIn" component={SignInScreen} />
-    </Stack.Navigator>
-  );
-};
-
+import myImage from './../../assets/images/img.png';
+import myImage2 from './../../assets/images/Logo2.png';
 
 const MainScreen = () => {
   const navigation = useNavigation();
@@ -102,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MainContainer;
+export default MainScreen;

@@ -1,13 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Image, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
-import myImage2 from '../../asset/images/Logo2.png'; // Importer votre logo
-import myImage3 from '../../asset/images/img.png'; // Importer votre image Google
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+
+import myImage2 from './../../assets/images/Logo3.png';
+import myImage3 from './../../assets/images/google.png';
 
 const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+      GoogleSignin.configure({
+        webClientId: '869924086974-o47pk711o6qkddo40nem6p4q2h9skg3i.apps.googleusercontent.com',
+      });
+    }, []);
+
+    async function onGoogleButtonPress() {
+        try {
+          await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+          await GoogleSignin.signOut(); // Déconnexion de l'utilisateur actuel
+          const { idToken, user } = await GoogleSignin.signIn();
+          console.log(user);
+          navigation.navigate('Welcome');
+          const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+          return auth().signInWithCredential(googleCredential);
+        } catch (error) {
+          console.log(error);
+          if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+            Alert.alert('La connexion a été annulée.');
+          } else if (error.code === statusCodes.IN_PROGRESS) {
+            Alert.alert('La connexion est en cours...');
+          } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+            Alert.alert('Les services Google Play ne sont pas disponibles ou obsolètes.');
+          } else {
+            Alert.alert('Erreur de connexion avec Google. Veuillez réessayer plus tard.');
+          }
+        }
+      }
 
   const handleSignUp = async () => {
     try {
@@ -20,9 +51,7 @@ const SignInScreen = ({ navigation }) => {
     }
   };
 
-  const handleLoginGoogle = () => {
-    // Code de connexion Google ici
-  };
+
 
   return (
     <View style={styles.container}>
@@ -54,7 +83,7 @@ const SignInScreen = ({ navigation }) => {
           <Text style={styles.continueWith}>Ou continuez avec</Text>
           <View style={styles.line}></View>
         </View>
-        <TouchableOpacity style={styles.buttongoogle} onPress={handleLoginGoogle}>
+        <TouchableOpacity style={styles.buttongoogle} onPress={onGoogleButtonPress}>
           <Image source={myImage3} style={styles.buttonIcon} />
           <Text style={styles.buttonTextg}>Google</Text>
         </TouchableOpacity>
