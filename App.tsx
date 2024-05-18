@@ -16,14 +16,14 @@ const App = () => {
   }
 
   const getToken = async () => {
-    const token = await messaging().getToken()
-    console.log("Token = ", token)
+    const token = await messaging().getToken();
+    console.log("Token = ", token);
   }
 
   useEffect(() => {
-    requestUserPermission()
-    getToken()
-  }, [])
+    requestUserPermission();
+    getToken();
+  }, []);
 
   return (
     <NavigationContainer>
