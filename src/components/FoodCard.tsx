@@ -1,79 +1,60 @@
 import React from 'react';
-import {StyleSheet, View, Image, Button, } from 'react-native';
-// import {Rating} from 'react-native-elements';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import MyText from './MyText';
-import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 
-function FoodCard({image, title, price, onPress, itemKey, }) {
+function FoodCard({ image, title, price, itemKey }) {
+  const navigation = useNavigation();
 
-  const navigation = useNavigation()
-
-
-
+  const handlePress = () => {
+    navigation.navigate('FoodDetail', { itemKey });
+  };
 
   return (
-    <View style={styles.con}>
-      <View style={styles.imageCon}>
-        <Image style={{height: '90%', width: '80%'}} source={{uri: image}} />
-      </View>
-      <View style={{flex: 1, paddingLeft: '12%'}}>
+    <TouchableOpacity onPress={handlePress} style={styles.container}>
+      <Image style={styles.image} source={{ uri: image }} />
+      <View style={styles.textContainer}>
         <MyText numberOfLines={1} style={styles.title}>
           {title}
         </MyText>
-        {/*
-        <Rating
-          ratingBackgroundColor="red"
-          tintColor="red"
-          ratingCount={5}
-          imageSize={24}
-          style={{alignSelf: 'flex-start', paddingTop: 4}}
-        />
-        */}
-
         <MyText style={styles.price}>{price} dh</MyText>
-        <View style={{flexDirection:"row"}}>
-
-        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  con: {
-    height: 190,
-    width: 180,
+  container: {
     borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: 'red',
+    backgroundColor: '#FF4B3A',
     marginHorizontal: 22,
+    marginTop: 14,
+    height: 200,
+    width: 350,
   },
-  imageCon: {
-    flex: 1,
-    justifyContent: 'center',
+  image: {
+    width: '100%',
+    height: '80%',
+    resizeMode: 'cover',
+  },
+  textContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
     alignItems: 'center',
+    height: '20%',
   },
   title: {
-    fontSize: 15,
-    fontFamily: 'Audiowide-Regular',
-    color: 'white',
-  },
+      fontSize: 18,
+      fontFamily: 'Raleway-Bold',
+      color: 'white',
+    },
   price: {
-    color: 'white',
-    fontSize: 30,
-    marginVertical: 1.5,
-  },
-  bagCon: {
-    backgroundColor: 'white',
-    height: 31,
-    width: 31,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 12,
-    right: 12,
-    borderRadius: 16.5,
-  },
+      color: 'white',
+      fontSize: 23,
+      marginVertical: 1.5,
+    },
 });
+
 export default FoodCard;

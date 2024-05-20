@@ -1,33 +1,20 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { FC } from 'react'
-
+import React, { FC } from 'react';
+import { StyleProp, Text, TextStyle } from 'react-native';
 
 interface Props {
-    title: string
+  onPress?: () => void;
+  style?: StyleProp<TextStyle>;
+  boldy?: boolean;
 }
 
-const MyButton : FC<Props> = ({title, onPress}) => {
+const MyText: FC<Props> = ({ onPress, children, style, boldy = false }) => {
+  const fontFamily = boldy ? 'Audiowide-Regular' : 'Redressed-Regular';
+
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-    </TouchableOpacity>
-  )
-}
+    <Text onPress={onPress} style={[{ color: 'black', fontFamily }, style]}>
+      {children} {/* Assurez-vous que la propriété children est affichée à l'intérieur d'un composant <Text> */}
+    </Text>
+  );
+};
 
-export default MyButton
-
-const styles = StyleSheet.create({
-    container:{
-        height:50,
-        width:"100%",
-        justifyContent:"center",
-        alignItems:"center",
-        backgroundColor:"#ff0036",
-        borderRadius: 30
-    },
-    title:{
-        color:"white",
-        fontSize: 20,
-        fontFamily:"Redressed-Regular"
-    }
-})
+export default MyText;

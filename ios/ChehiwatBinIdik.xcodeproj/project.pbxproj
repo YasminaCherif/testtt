@@ -14,6 +14,12 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-ChehiwatBinIdik-ChehiwatBinIdikTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-ChehiwatBinIdik-ChehiwatBinIdikTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		69C009A06AEC4A2889879625 /* Audiowide-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 216FE34FC38C44C58AC7196A /* Audiowide-Regular.ttf */; };
+		7F4755A86301407DA3AC83CF /* Langar-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D8445F9C24F47A593E71F95 /* Langar-Regular.ttf */; };
+		D267281DCD2446C3937AAD4F /* NovaFlat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 894888B28D4A40E2A5F7B590 /* NovaFlat-Regular.ttf */; };
+		AC1C9F94D420453081844507 /* Raleway-Italic-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E0EBC757A1BB49E49D4919C8 /* Raleway-Italic-VariableFont_wght.ttf */; };
+		93CEFF5ABC964D1DBABE8FFD /* Raleway-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8B648E344F6A492AA0E1518C /* Raleway-VariableFont_wght.ttf */; };
+		F4B082F0BEDA4028ACBEB631 /* Redressed-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A6219AC54A34711A33D39CB /* Redressed-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +42,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ChehiwatBinIdik/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ChehiwatBinIdik/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ChehiwatBinIdik/main.m; sourceTree = "<group>"; };
-	    13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ChehiwatBinIdik/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ChehiwatBinIdik/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-ChehiwatBinIdik-ChehiwatBinIdikTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ChehiwatBinIdik-ChehiwatBinIdikTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-ChehiwatBinIdik.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChehiwatBinIdik.debug.xcconfig"; path = "Target Support Files/Pods-ChehiwatBinIdik/Pods-ChehiwatBinIdik.debug.xcconfig"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-ChehiwatBinIdik.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChehiwatBinIdik.release.xcconfig"; path = "Target Support Files/Pods-ChehiwatBinIdik/Pods-ChehiwatBinIdik.release.xcconfig"; sourceTree = "<group>"; };
@@ -45,6 +51,12 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ChehiwatBinIdik/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-ChehiwatBinIdik-ChehiwatBinIdikTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChehiwatBinIdik-ChehiwatBinIdikTests.release.xcconfig"; path = "Target Support Files/Pods-ChehiwatBinIdik-ChehiwatBinIdikTests/Pods-ChehiwatBinIdik-ChehiwatBinIdikTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		216FE34FC38C44C58AC7196A /* Audiowide-Regular.ttf */ = {isa = PBXFileReference; name = "Audiowide-Regular.ttf"; path = "../assets/fonts/Audiowide-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		4D8445F9C24F47A593E71F95 /* Langar-Regular.ttf */ = {isa = PBXFileReference; name = "Langar-Regular.ttf"; path = "../assets/fonts/Langar-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		894888B28D4A40E2A5F7B590 /* NovaFlat-Regular.ttf */ = {isa = PBXFileReference; name = "NovaFlat-Regular.ttf"; path = "../assets/fonts/NovaFlat-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E0EBC757A1BB49E49D4919C8 /* Raleway-Italic-VariableFont_wght.ttf */ = {isa = PBXFileReference; name = "Raleway-Italic-VariableFont_wght.ttf"; path = "../assets/fonts/Raleway-Italic-VariableFont_wght.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8B648E344F6A492AA0E1518C /* Raleway-VariableFont_wght.ttf */ = {isa = PBXFileReference; name = "Raleway-VariableFont_wght.ttf"; path = "../assets/fonts/Raleway-VariableFont_wght.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		6A6219AC54A34711A33D39CB /* Redressed-Regular.ttf */ = {isa = PBXFileReference; name = "Redressed-Regular.ttf"; path = "../assets/fonts/Redressed-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +136,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				20D64F68C269467FABAE8B00 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -149,6 +162,20 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		20D64F68C269467FABAE8B00 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				216FE34FC38C44C58AC7196A /* Audiowide-Regular.ttf */,
+				4D8445F9C24F47A593E71F95 /* Langar-Regular.ttf */,
+				894888B28D4A40E2A5F7B590 /* NovaFlat-Regular.ttf */,
+				E0EBC757A1BB49E49D4919C8 /* Raleway-Italic-VariableFont_wght.ttf */,
+				8B648E344F6A492AA0E1518C /* Raleway-VariableFont_wght.ttf */,
+				6A6219AC54A34711A33D39CB /* Redressed-Regular.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -245,6 +272,12 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				69C009A06AEC4A2889879625 /* Audiowide-Regular.ttf in Resources */,
+				7F4755A86301407DA3AC83CF /* Langar-Regular.ttf in Resources */,
+				D267281DCD2446C3937AAD4F /* NovaFlat-Regular.ttf in Resources */,
+				AC1C9F94D420453081844507 /* Raleway-Italic-VariableFont_wght.ttf in Resources */,
+				93CEFF5ABC964D1DBABE8FFD /* Raleway-VariableFont_wght.ttf in Resources */,
+				F4B082F0BEDA4028ACBEB631 /* Redressed-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

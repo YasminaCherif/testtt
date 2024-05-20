@@ -1,42 +1,37 @@
-import React, {FC} from 'react';
-import {StyleSheet, View, Image, Text, Button} from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+import React, { FC } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-const Category: FC<{image: any; title: string, itemKey:string}> = ({image, title,itemKey}) => {
-
-
+const Category: FC<{ title: string; itemKey: string; isSelected: boolean; onSelect: (key: string) => void }> = ({ title, itemKey, isSelected, onSelect }) => {
   return (
-    <View style={styles.con}>
-
-      <Image style={styles.image} source={image} />
-      <Text style={styles.text}>{title}</Text>
-    </View>
+    <TouchableOpacity onPress={() => onSelect(itemKey)}>
+      <View style={styles.container}>
+        <Text style={[styles.text, isSelected && styles.selectedText]}>{title}</Text>
+        {isSelected && <View style={styles.underline} />}
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  con: {
-    height: 120,
-    width: 139,
-    borderRadius: 32,
-    overflow: 'hidden',
-    justifyContent: 'center',
+  container: {
     alignItems: 'center',
-    marginHorizontal: 11,
-    borderWidth: 1,
-    borderColor: 'red',
-  },
-  image: {
-    height: '48%',
-    width: '48%',
-    marginBottom: 5,
+    marginHorizontal: 12,
   },
   text: {
-    fontSize: 15,
-    fontFamily: 'Redressed-Regular',
-    color: 'red',
+    fontSize: 16,
+    fontFamily: 'Raleway-Bold',
+    color: 'grey',
+    textAlign: 'center', // Center the text if needed
+  },
+  selectedText: {
+    color: '#FF4B3A',
+  },
+  underline: {
+    height: 2,
+    backgroundColor: '#FF4B3A',
+    width: '100%',
+    marginTop: 2,
   },
 });
+
 export default Category;
-
-

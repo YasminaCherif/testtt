@@ -1,57 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Image, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, Image, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import database from '@react-native-firebase/database';
 
-import myImage2 from './../../assets/images/Logo3.png';
-import myImage3 from './../../assets/images/google.png';
+import myImage2 from '../../assets/images/Logo3.png';
+import myImage3 from '../../assets/images/google.png';
 
 const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
-      GoogleSignin.configure({
-        webClientId: '869924086974-o47pk711o6qkddo40nem6p4q2h9skg3i.apps.googleusercontent.com',
-      });
-    }, []);
+    GoogleSignin.configure({
+      webClientId: '869924086974-o47pk711o6qkddo40nem6p4q2h9skg3i.apps.googleusercontent.com',
+    });
+  }, []);
 
-    async function onGoogleButtonPress() {
-        try {
-          await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-          await GoogleSignin.signOut(); // Déconnexion de l'utilisateur actuel
-          const { idToken, user } = await GoogleSignin.signIn();
-          console.log(user);
-          navigation.navigate('Welcome');
-          const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-          return auth().signInWithCredential(googleCredential);
-        } catch (error) {
-          console.log(error);
-          if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-            Alert.alert('La connexion a été annulée.');
-          } else if (error.code === statusCodes.IN_PROGRESS) {
-            Alert.alert('La connexion est en cours...');
-          } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-            Alert.alert('Les services Google Play ne sont pas disponibles ou obsolètes.');
-          } else {
-            Alert.alert('Erreur de connexion avec Google. Veuillez réessayer plus tard.');
-          }
-        }
+  async function onGoogleButtonPress() {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      await GoogleSignin.signOut();
+      const { idToken, user } = await GoogleSignin.signIn();
+      console.log(user);
+      navigation.navigate('Welcome');
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      return auth().signInWithCredential(googleCredential);
+    } catch (error) {
+      console.log(error);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        Alert.alert('La connexion a été annulée.');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        Alert.alert('La connexion est en cours...');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        Alert.alert('Les services Google Play ne sont pas disponibles ou obsolètes.');
+      } else {
+        Alert.alert('Erreur de connexion avec Google. Veuillez réessayer plus tard.');
       }
+    }
+  }
 
   const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Les mots de passe ne correspondent pas.");
+      return;
+    }
     try {
       const userCredentials = await auth().createUserWithEmailAndPassword(email, password);
+      const userId = userCredentials.user.uid;
       console.log('Utilisateur inscrit avec succès:', userCredentials.user);
-      // Rediriger vers la page "Welcome" après une inscription réussie
-      navigation.navigate('Welcome'); // Assurez-vous que 'Welcome' est le nom de votre route vers la page "Welcome"
+
+      // Save user data to Firebase Realtime Database
+      await database().ref(`/users/${userId}`).set({
+        email: email,
+        phoneNumber: phoneNumber,
+      });
+
+
+      navigation.navigate('Welcome');
     } catch (error) {
       console.error('Erreur d\'inscription:', error);
+      Alert.alert('Erreur d\'inscription', error.message);
     }
   };
-
-
 
   return (
     <View style={styles.container}>
@@ -74,6 +88,20 @@ const SignInScreen = ({ navigation }) => {
           secureTextEntry={true}
           onChangeText={setPassword}
           value={password}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirmer le mot de passe"
+          secureTextEntry={true}
+          onChangeText={setConfirmPassword}
+          value={confirmPassword}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Numéro de téléphone"
+          keyboardType="phone-pad"
+          onChangeText={setPhoneNumber}
+          value={phoneNumber}
         />
         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
           <Text style={styles.buttonText}>S'inscrire</Text>
