@@ -1,3 +1,4 @@
+// TabNavigator.js
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -18,7 +19,7 @@ function TabNavigator() {
        screenOptions={{
          tabBarShowLabel: false,
          tabBarStyle: {
-           backgroundColor: '#F2F2F2',
+           backgroundColor: '#E0E0E0',
              borderTopWidth: 0, // Set your desired color here
          },
        }}

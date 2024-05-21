@@ -1,22 +1,39 @@
+// Dashboard.js
+
 import React from 'react';
-import { View, Text, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import back from './../../assets/images/back.png';
 
-function DashboardScreen() {
-  const navigation = useNavigation();
-
-  const handleSupplierMode = () => {
-    // Ajoutez ici la logique pour activer le mode fournisseur
-    // Par exemple, naviguer vers SignUpScreen
-    navigation.navigate('SignInFournisseur'); // Assurez-vous que le nom de la route est correct
-  };
-
+const DashboardScreen = ({ onClose }) => {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: 'black' }}> Welcome to the Dashboard!</Text>
-      <Button title="Mode Fournisseur" onPress={handleSupplierMode} />
+    <View style={styles.container}>
+      <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+        <Image source={back} style={styles.icon} />
+      </TouchableOpacity>
+      {/* Add your dashboard content here */}
+      <Text>This is your dashboard content</Text>
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+  },
+  icon:{
+    height:30,
+    width:30,
+    marginLeft: 30 ,
+    marginTop: -20,
+  }
+});
 
 export default DashboardScreen;

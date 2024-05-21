@@ -4,6 +4,7 @@ import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import database from '@react-native-firebase/database';
+import CheckBox from '@react-native-community/checkbox';
 
 import myImage2 from '../../assets/images/Logo3.png';
 import myImage3 from '../../assets/images/google.png';
@@ -13,6 +14,9 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [isFournisseur, setIsFournisseur] = useState(false);
+  const [cinNumber, setCinNumber] = useState('');
+  const [completeAddress, setCompleteAddress] = useState('');
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -25,10 +29,26 @@ const SignInScreen = ({ navigation }) => {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       await GoogleSignin.signOut();
       const { idToken, user } = await GoogleSignin.signIn();
-      console.log(user);
-      navigation.navigate('Welcome');
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      return auth().signInWithCredential(googleCredential);
+      const signInResult = await auth().signInWithCredential(googleCredential);
+
+      // Check if user exists in the database
+      const userRef = database().ref(`/users/${signInResult.user.uid}`);
+      userRef.once('value')
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            // Navigate based on user role
+            if (userData.role === 'fournisseur') {
+              navigation.navigate('HomeScreenFournisseur');
+            } else {
+              navigation.navigate('Home');
+            }
+          } else {
+            // User does not exist, navigate to form screen
+            navigation.navigate('SignUpForm', { user: signInResult.user });
+          }
+        });
     } catch (error) {
       console.log(error);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -54,13 +74,25 @@ const SignInScreen = ({ navigation }) => {
       console.log('Utilisateur inscrit avec succès:', userCredentials.user);
 
       // Save user data to Firebase Realtime Database
-      await database().ref(`/users/${userId}`).set({
+      const userData = {
         email: email,
         phoneNumber: phoneNumber,
-      });
+        role: isFournisseur ? 'fournisseur' : 'client',
+      };
 
+      if (isFournisseur) {
+        userData.cinNumber = cinNumber;
+        userData.completeAddress = completeAddress;
+      }
 
-      navigation.navigate('Welcome');
+      await database().ref(`/users/${userId}`).set(userData);
+
+      // Navigate based on user role
+      if (isFournisseur) {
+        navigation.navigate('HomeScreenFournisseur');
+      } else {
+        navigation.navigate('Welcome');
+      }
     } catch (error) {
       console.error('Erreur d\'inscription:', error);
       Alert.alert('Erreur d\'inscription', error.message);
@@ -70,10 +102,7 @@ const SignInScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <Image
-          source={myImage2}
-          style={styles.logo}
-        />
+        <Image source={myImage2} style={styles.logo} />
         <Text style={styles.title}>S'inscrire</Text>
         <TextInput
           style={styles.input}
@@ -103,6 +132,30 @@ const SignInScreen = ({ navigation }) => {
           onChangeText={setPhoneNumber}
           value={phoneNumber}
         />
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={isFournisseur}
+            onValueChange={setIsFournisseur}
+            style={styles.checkbox}
+          />
+          <Text style={styles.label}>Je suis un fournisseur</Text>
+        </View>
+        {isFournisseur && (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Numéro de la CIN"
+              onChangeText={setCinNumber}
+              value={cinNumber}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Adresse complète"
+              onChangeText={setCompleteAddress}
+              value={completeAddress}
+            />
+          </>
+        )}
         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
           <Text style={styles.buttonText}>S'inscrire</Text>
         </TouchableOpacity>
@@ -131,7 +184,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontFamily: 'Raleway-Bold',
-    marginTop: -40,
+    marginTop: -60,
     marginBottom: 20,
     color: '#FF4B3A',
   },
@@ -200,6 +253,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     color: 'grey',
     marginTop: -10,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  checkbox: {
+    alignSelf: 'center',
+  },
+  label: {
+    margin: 8,
+    fontFamily: 'Raleway-Medium',
   },
 });
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import FoodDetailCard from '../components/FoodDetailCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function FoodDetailScreen({ route }) {
   const { itemKey } = route.params;
@@ -29,6 +30,27 @@ function FoodDetailScreen({ route }) {
     Alert.alert("Succès", `${food.title} a été ajouté au panier.`);
   };
 
+  const handleAddToFavorites = async () => {
+    try {
+      const favoritesString = await AsyncStorage.getItem('favorites');
+      const favorites = favoritesString ? JSON.parse(favoritesString) : [];
+
+      if (!favorites.find(favorite => favorite.itemKey === itemKey)) {
+        favorites.push({ itemKey, title: food.title, price: food.price }); // Assurez-vous de stocker le prix
+        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+        setIsFavorite(true);
+        Alert.alert('Succès', `${food.title} a été ajouté aux favoris.`);
+      } else {
+        Alert.alert('Info', `${food.title} est déjà dans vos favoris.`);
+      }
+      console.log('Favorites:', favorites);
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'ajout aux favoris.');
+    }
+  };
+
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -55,6 +77,9 @@ function FoodDetailScreen({ route }) {
       />
       <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
         <Text style={styles.buttonText}>Ajouter au panier</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleAddToFavorites}>
+        <Text style={styles.buttonText}>Ajouter aux favoris</Text>
       </TouchableOpacity>
     </View>
   );

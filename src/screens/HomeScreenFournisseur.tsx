@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ActivityIndicator, FlatList, Image, TouchableOpacity, Modal, Dimensions } from 'react-native';
+import { StyleSheet, View, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 import MyView from '../components/MyView';
 import MyText from '../components/MyText';
@@ -7,21 +7,17 @@ import Search from '../components/Search';
 import Category from '../components/Category';
 import firestore from '@react-native-firebase/firestore';
 import FoodCard from '../components/FoodCard';
+import AddPlat from '../components/AddPlat';
 import DashboardIcon from './../../assets/images/dashbord.png';
 import CartIcon from './../../assets/images/panier.png';
-import DashboardScreen from './DashboardScreen';
 
-
- const windowHeight = Dimensions.get('window').height;
-
-function HomeScreen({ navigation }) {
+function HomeScreenFournisseur({ navigation }) {
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState([]);
     const [promotions, setPromotions] = useState([]);
     const [foods, setFoods] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [plats, setPlats] = useState([]);
-    const [isDashboardOpen, setIsDashboardOpen] = useState(false);
 
     useEffect(() => {
         const subscriber = firestore()
@@ -75,15 +71,13 @@ function HomeScreen({ navigation }) {
         navigation.navigate('Dashboard');
     };
 
-
-
-    const toggleDashboard = () => {
-        setIsDashboardOpen(!isDashboardOpen);
-      };
-
     const navigateToCart = () => {
         navigation.navigate('cart'); // Make sure the route name is 'Cart'
     };
+
+    const navigateToAddPlat = () => {
+            navigation.navigate('AddPlat'); // Remplacez 'AddPlat' par le nom de votre vue pour ajouter un plat
+        };
 
     const getPlatsByCategory = async (categoryId) => {
         try {
@@ -118,32 +112,24 @@ function HomeScreen({ navigation }) {
     }
 
     return (
-
+        <ScrollView style={styles.scrollView}>
             <MyView style={styles.con}>
-                <View style={styles.header}>
-                  {/* Open Dashboard button */}
-                        <TouchableOpacity onPress={toggleDashboard} style={styles.dashboardButton}>
-                          <Image source={DashboardIcon} style={styles.icon} />
-                        </TouchableOpacity>
 
-                        {/* Dashboard modal */}
-                       <Modal visible={isDashboardOpen} transparent={true} animationType="none">
-                         <View style={styles.modalContainer}>
-                           <View style={styles.modal}>
-                             <DashboardScreen onClose={toggleDashboard} />
-                           </View>
-                         </View>
-                       </Modal>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={navigateToDashboard}>
+                        <Image source={DashboardIcon} style={styles.icon} />
+                    </TouchableOpacity>
                     <View style={styles.space}></View>
                     <TouchableOpacity onPress={navigateToCart}>
                         <Image source={CartIcon} style={styles.icon} />
                     </TouchableOpacity>
                 </View>
-                   <ScrollView style={styles.scrollView}>
                 <View>
-                    <MyText style={styles.headerText}>Plat fait maison...{'\n'}Relevé d'une touche marocaine</MyText>
+                    <MyText style={styles.headerText}>salam founisseur</MyText>
                 </View>
+
                 <Search />
+
                 <View style={{ height: 50 }}>
                     <FlatList
                         horizontal
@@ -160,6 +146,11 @@ function HomeScreen({ navigation }) {
                         showsHorizontalScrollIndicator={false}
                     />
                 </View>
+                <TouchableOpacity onPress={navigateToAddPlat}>
+                                                <View style={styles.addPlatButton}>
+                                                    <MyText style={styles.addPlatButtonText}>Ajouter un plat</MyText>
+                                                </View>
+                                            </TouchableOpacity>
                 <View style={{ marginTop: -68 }}>
                     <MyText style={styles.text}> </MyText>
                     <FlatList
@@ -207,9 +198,8 @@ function HomeScreen({ navigation }) {
                         )}
                     />
                 </View>
-                </ScrollView>
             </MyView>
-
+        </ScrollView>
     );
 }
 
@@ -219,10 +209,10 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#f7f6ff',
     },
     con: {
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#F2F2F2',
     },
     text: {
         marginLeft: 21,
@@ -235,8 +225,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 10,
-        marginTop: 10,
-        backgroundColor:'#E0E0E0',
+        marginTop: 20,
     },
     space: {
         marginLeft: 'auto',
@@ -246,6 +235,20 @@ const styles = StyleSheet.create({
         height: 40,
         marginRight: 10,
     },
+    addPlatButton: {
+            backgroundColor: '#FF4B3A',
+            paddingVertical: 15,
+            paddingHorizontal: 10,
+            borderRadius: 5,
+            marginTop: 10,
+            marginLeft: 15,
+            marginRight: 15,
+        },
+        addPlatButtonText: {
+                color: '#FFFFFF',
+                fontSize: 16,
+                fontWeight: 'bold',
+            },
     headerText: {
         flex: 1,
         marginLeft: 21,
@@ -253,23 +256,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 20,
         fontFamily: 'Raleway-Bold',
-
     },
-        modalContainer: {
-               flex: 1,
-               justifyContent: 'flex-start',
-               alignItems: 'flex-start', // Align modal to the left side
-
-           },
-           modal: {
-               backgroundColor: '#FFFFFF',
-               width: Dimensions.get('window').width / 2, // Half of the screen width
-               height: '100%', // Take up entire height of the screen
-               width: 300,
-               borderTopRightRadius: 20, // Rounded corner on top-right
-               borderBottomRightRadius: 20, // Rounded corner on bottom-right
-               padding: 20,
-           },
 });
 
-export default HomeScreen;
+export default HomeScreenFournisseur;

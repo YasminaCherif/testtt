@@ -25,9 +25,10 @@ function FavoritesScreen() {
       <Text style={styles.title}>Favorites</Text>
       <View style={styles.favoriteList}>
         {favorites.map((favorite, index) => (
-          <Text key={index} style={styles.favoriteItem}>
-            {favorite}
-          </Text>
+          <View key={index} style={styles.favoriteItem}>
+            <Text style={styles.titleText}>{favorite.title}</Text>
+            <Text style={styles.priceText}>{favorite.price} DH</Text>
+          </View>
         ))}
       </View>
     </View>
@@ -50,8 +51,20 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   favoriteItem: {
-    fontSize: 18,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 5,
+  },
+  titleText: {
+    fontSize: 18,
+    marginRight: 10,
+    color:'black'
+  },
+  priceText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color:'black'
   },
 });
 
