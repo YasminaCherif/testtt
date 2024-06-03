@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -10,13 +11,19 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      await auth().signInWithEmailAndPassword(email, password);
-      // If login succeeds, clear error and set login success
+      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userId = userCredential.user.uid; // Récupérer l'ID utilisateur
+
+      // Stocker l'ID du fournisseur
+      await AsyncStorage.setItem('fournisseurId', userId);
+      console.log('Fournisseur ID stocké:', userId); // Log pour vérifier
+
+      // Si la connexion réussit, effacez l'erreur et définissez le succès de la connexion
       setError('');
       setLoginSuccess(true);
       console.log('Logged in successfully!');
     } catch (e) {
-      // If login fails, set error message and reset login success
+      // Si la connexion échoue, définissez le message d'erreur et réinitialisez le succès de la connexion
       setError(e.message);
       setLoginSuccess(false);
     }

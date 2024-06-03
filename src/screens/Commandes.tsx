@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
@@ -20,22 +20,7 @@ const Commandes = () => {
           .where('userId', '==', user.uid)
           .get();
 
-        const ordersData = userOrders.docs.map(doc => {
-          const data = doc.data();
-          let statusClient = data.statusClient;
-
-          // Update statusClient based on statusFournisseur
-          if (data.statusFournisseur === 'Nouvelle') {
-            statusClient = 'Commande en cours de traitement';
-          } else if (data.statusFournisseur === 'encours') {
-            statusClient = 'En cours de préparation';
-          } else if (data.statusFournisseur === 'refusee') {
-            statusClient = 'Commande refusée';
-          }
-
-          return { id: doc.id, ...data, statusClient };
-        });
-
+        const ordersData = userOrders.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setOrders(ordersData);
         setLoading(false);
       } catch (error) {
@@ -56,6 +41,7 @@ const Commandes = () => {
   }
 
   return (
+    <ScrollView contentContainerStyle={styles.scrollViewContent}>
     <View style={styles.container}>
       {orders.length === 0 ? (
         <Text style={styles.emptyText}>Aucune commande trouvée.</Text>
@@ -79,6 +65,7 @@ const Commandes = () => {
         </View>
       )}
     </View>
+    </ScrollView>
   );
 };
 

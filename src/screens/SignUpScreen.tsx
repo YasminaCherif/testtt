@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import database from '@react-native-firebase/database';
 import CheckBox from '@react-native-community/checkbox';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import myImage2 from '../../assets/images/Logo3.png';
 import myImage3 from '../../assets/images/google.png';
@@ -85,6 +86,9 @@ const SignInScreen = ({ navigation }) => {
       if (isFournisseur) {
         userData.cinNumber = cinNumber;
         userData.completeAddress = completeAddress;
+
+        // Save fournisseur ID to AsyncStorage
+        await AsyncStorage.setItem('fournisseurId', userId);
       }
 
       await database().ref(`/users/${userId}`).set(userData);
@@ -110,14 +114,12 @@ const SignInScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Nom complet"
           onChangeText={setFullName}
-          placeholderTextColor="gray"
           value={fullName}
         />
         <TextInput
           style={styles.input}
           placeholder="Email"
           keyboardType="email-address"
-          placeholderTextColor="gray"
           onChangeText={setEmail}
           value={email}
         />
@@ -125,7 +127,6 @@ const SignInScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Mot de passe"
           secureTextEntry={true}
-          placeholderTextColor="gray"
           onChangeText={setPassword}
           value={password}
         />
@@ -134,7 +135,6 @@ const SignInScreen = ({ navigation }) => {
           placeholder="Confirmer le mot de passe"
           secureTextEntry={true}
           onChangeText={setConfirmPassword}
-          placeholderTextColor="gray"
           value={confirmPassword}
         />
         <TextInput
@@ -142,7 +142,6 @@ const SignInScreen = ({ navigation }) => {
           placeholder="Numéro de téléphone"
           keyboardType="phone-pad"
           onChangeText={setPhoneNumber}
-          placeholderTextColor="gray"
           value={phoneNumber}
         />
         <View style={styles.checkboxContainer}>
@@ -159,14 +158,12 @@ const SignInScreen = ({ navigation }) => {
               style={styles.input}
               placeholder="Numéro de la CIN"
               onChangeText={setCinNumber}
-              placeholderTextColor="gray"
               value={cinNumber}
             />
             <TextInput
               style={styles.input}
               placeholder="Adresse complète"
               onChangeText={setCompleteAddress}
-              placeholderTextColor="gray"
               value={completeAddress}
             />
           </>
@@ -211,7 +208,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     borderRadius: 10,
     fontFamily: 'Raleway-Medium',
-    color:'black',
   },
   logo: {
     marginLeft: 20,
@@ -281,7 +277,6 @@ const styles = StyleSheet.create({
   label: {
     margin: 8,
     fontFamily: 'Raleway-Medium',
-    color:'black',
   },
 });
 
