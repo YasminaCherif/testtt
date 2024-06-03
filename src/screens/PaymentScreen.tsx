@@ -76,7 +76,8 @@ const PaymentScreen = () => {
       }
 
       await firestore().collection('commandes').doc(orderId).update({
-        statusFournisseur: 'Nouvelle', // Only updating fournisseur status
+        statusClient: 'En cours de traitement',
+        statusFournisseur: 'Nouvelle commande ',
         address, // Save the address in the order document
       });
 

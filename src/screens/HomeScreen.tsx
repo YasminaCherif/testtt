@@ -391,6 +391,7 @@ const styles = StyleSheet.create({
         width: 300,
         borderTopRightRadius: 20,
         borderBottomRightRadius: 20,
+        padding: 20,
     },
     cartContainer: {
         position: 'relative',
