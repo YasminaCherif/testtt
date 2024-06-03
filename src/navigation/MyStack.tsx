@@ -15,7 +15,7 @@ import FoodDetailScreen from '../screens/FoodDetailScreen';
 import Commandes from '../screens/Commandes';
 import AProposDeNous from '../screens/AProposDeNous';
 import Politiques from '../screens/Politiques';
-import OffresEtPromos from '../screens/OffresEtPromos';
+
 import SearchResultsPage from '../screens/SearchResultsPage';
 import notificationScreen from '../screens/notificationScreen';
 import { StripeProvider } from "@stripe/stripe-react-native";
@@ -49,7 +49,7 @@ export default function MyStack() {
         <Stack.Screen name="Commandes" component={Commandes} />
         <Stack.Screen name="AProposDeNous" component={AProposDeNous} />
         <Stack.Screen name="Politiques" component={Politiques} />
-        <Stack.Screen name="OffresEtPromos" component={OffresEtPromos} />
+
         <Stack.Screen name="SearchResultsPage" component={SearchResultsPage} />
         <Stack.Screen name="notification" component={notificationScreen} />
         <Stack.Screen name="pay" component={PaymentScreen} />
