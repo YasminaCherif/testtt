@@ -106,29 +106,31 @@ const PaymentScreen = () => {
     }
   };
 
-  const createOrder = async (items, userId, totalPrice, address, deliveryMethod) => {
-    try {
-      const orderDetails = {
-        userId,
-        items: items.map(item => ({
-          ...item,
-          fournisseurId: item.fournisseurId || 'unknown',
-          imageURL: item.imageURL || 'unknown', // Include imageURL here
-          averageRating: item.averageRating || 0, // Include averageRating here
-        })),
-        totalPrice,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-        address,
-        deliveryMethod,
-      };
+ const createOrder = async (items, userId, totalPrice, address, deliveryMethod) => {
+   try {
+     const orderDetails = {
+       userId,
+       items: items.map(item => ({
+         ...item,
+         fournisseurId: item.fournisseurId || 'unknown',
+         imageURL: item.imageURL || 'unknown',
+         averageRating: item.averageRating || 0,
+       })),
+       totalPrice,
+       createdAt: firestore.FieldValue.serverTimestamp(),
+       address,
+       deliveryMethod,
+       fournisseurRating: null, // Ajouter le champ fournisseurRating avec une valeur null par défaut
+     };
 
-      const orderRef = await firestore().collection('commandes').add(orderDetails);
-      return orderRef.id;
-    } catch (error) {
-      console.error('Error creating order:', error);
-      return null;
-    }
-  };
+     const orderRef = await firestore().collection('commandes').add(orderDetails);
+     return orderRef.id;
+   } catch (error) {
+     console.error('Error creating order:', error);
+     return null;
+   }
+ };
+
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>

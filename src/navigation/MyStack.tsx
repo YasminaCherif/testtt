@@ -8,7 +8,7 @@ import DashboardScreen from '../screens/DashboardScreen';
 import CartScreen from '../screens/CartScreen';
 import TabNavigator from './TabNavigator';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import HomeScreenFournisseur from '../screens/HomeScreenFournisseur';
+
 
 import ModifierPlatScreen from'../screens/ModifierPlatScreen';
 import FoodDetailScreen from '../screens/FoodDetailScreen';
@@ -43,7 +43,6 @@ export default function MyStack() {
         <Stack.Screen name="Welcome" component={TabNavigator} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
         <Stack.Screen name="cart" component={CartScreen} />
-        <Stack.Screen name="HomeScreenFournisseur" component={HomeScreenFournisseur} />
 
         <Stack.Screen name="FoodDetail" component={FoodDetailScreen} />
         <Stack.Screen name="ModifierPlat" component={ModifierPlatScreen} />

@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Modal from 'react-native-modal';
 
 const Commandes = () => {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [rating, setRating] = useState('');
+  const [comment, setComment] = useState('');
+  const [currentOrder, setCurrentOrder] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -20,7 +25,24 @@ const Commandes = () => {
           .where('userId', '==', user.uid)
           .get();
 
-        const ordersData = userOrders.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const ordersData = userOrders.docs.map(doc => {
+          const data = doc.data();
+          let statusClient = data.statusClient;
+
+          // Update statusClient based on statusFournisseur
+          if (data.statusFournisseur === 'Nouvelle') {
+            statusClient = 'Commande en cours de traitement';
+          } else if (data.statusFournisseur === 'encours') {
+            statusClient = 'En cours de préparation';
+          } else if (data.statusFournisseur === 'refusee') {
+            statusClient = 'Commande refusée';
+          } else if (data.statusFournisseur === 'livree') {
+            statusClient = 'Commande Livrée';
+          }
+
+          return { id: doc.id, ...data, statusClient };
+        });
+
         setOrders(ordersData);
         setLoading(false);
       } catch (error) {
@@ -32,6 +54,54 @@ const Commandes = () => {
     fetchOrders();
   }, []);
 
+  const handleRateOrder = (order) => {
+    setCurrentOrder(order);
+    setModalVisible(true);
+  };
+
+  const submitRating = async () => {
+    if (!rating || !comment) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
+    try {
+      const user = auth().currentUser;
+
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      const platId = currentOrder.items[0].itemKey;
+      const fournisseurId = currentOrder.items[0].fournisseurId;
+
+      if (!platId || !fournisseurId) {
+        throw new Error('Invalid platId or fournisseurId');
+      }
+
+      // Ajouter une entrée dans la collection 'ratings'
+      await firestore().collection('ratings').add({
+        userId: user.uid,
+        platId: platId,
+        fournisseurId: fournisseurId,
+        rating: parseInt(rating),
+        comment,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      });
+
+      // Marquer la commande comme notée
+      await firestore().collection('commandes').doc(currentOrder.id).update({
+        rated: true,
+      });
+
+      setModalVisible(false);
+      setRating('');
+      setComment('');
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -42,29 +112,59 @@ const Commandes = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
-    <View style={styles.container}>
-      {orders.length === 0 ? (
-        <Text style={styles.emptyText}>Aucune commande trouvée.</Text>
-      ) : (
-        <View>
-          {orders.map(order => (
-            <View key={order.id} style={styles.orderContainer}>
-              <Text style={styles.orderStatus}>Statut: {order.statusClient}</Text>
-              <Text style={styles.orderText}>Plats commandés :</Text>
-              <View style={styles.itemsContainer}>
-                {order.items.map((item, index) => (
-                  <View key={index} style={styles.itemContainer}>
-                    <Text style={styles.itemTitle}>{item.title}</Text>
-                    <Text style={styles.itemText}>Quantité: {item.quantity}</Text>
-                    <Text style={styles.itemText}>Prix: {item.price} dh</Text>
-                  </View>
-                ))}
+      <View style={styles.container}>
+        {orders.length === 0 ? (
+          <Text style={styles.emptyText}>Aucune commande trouvée.</Text>
+        ) : (
+          <View>
+            {orders.map(order => (
+              <View key={order.id} style={styles.orderContainer}>
+                <Text style={styles.orderStatus}>Statut: {order.statusClient}</Text>
+                <Text style={styles.orderText}>Plats commandés :</Text>
+                <View style={styles.itemsContainer}>
+                  {order.items.map((item, index) => (
+                    <View key={index} style={styles.itemContainer}>
+                      <Text style={styles.itemTitle}>{item.title}</Text>
+                      <Text style={styles.itemText}>Quantité: {item.quantity}</Text>
+                      <Text style={styles.itemText}>Prix: {item.price} dh</Text>
+                    </View>
+                  ))}
+                </View>
+                {order.statusClient === 'Commande Livrée' && !order.rated && (
+                  <TouchableOpacity
+                    style={styles.rateButton}
+                    onPress={() => handleRateOrder(order)}
+                  >
+                    <Text style={styles.rateButtonText}>Noter le Fournisseur</Text>
+                  </TouchableOpacity>
+                )}
               </View>
-            </View>
-          ))}
+            ))}
+          </View>
+        )}
+      </View>
+
+      <Modal isVisible={isModalVisible}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Noter le Fournisseur</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Note (1-5)"
+            keyboardType="numeric"
+            value={rating}
+            onChangeText={setRating}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Commentaire"
+            value={comment}
+            onChangeText={setComment}
+          />
+          <TouchableOpacity style={styles.button} onPress={submitRating}>
+            <Text style={styles.buttonText}>Soumettre</Text>
+          </TouchableOpacity>
         </View>
-      )}
-    </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -79,6 +179,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  scrollViewContent: {
+    paddingVertical: 20,
   },
   emptyText: {
     textAlign: 'center',
@@ -123,6 +226,48 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 14,
     color: 'gray',
+  },
+  rateButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#FF4B3A',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  rateButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  button: {
+    backgroundColor: '#FF4B3A',
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 30,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 20,
   },
 });
 
