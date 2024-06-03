@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ImageBackground, Image, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import myImage from './../../assets/images/img.png';
-import myImage2 from './../../assets/images/Logo2.png';
+import myImage2 from './../../assets/images/Logo3.png';
 
 const MainScreen = () => {
   const navigation = useNavigation();
@@ -79,8 +79,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonText: {
-    fontFamily: 'Raleway',
+    fontFamily: 'Raleway-Bold',
     fontSize: 19,
+    color:'black',
   },
 });
 

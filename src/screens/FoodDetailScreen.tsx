@@ -2,119 +2,192 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import FoodDetailCard from '../components/FoodDetailCard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from '@react-native-firebase/auth';
+import axios from 'axios';
+import database from '@react-native-firebase/database';
 
-function FoodDetailScreen({ route }) {
-  const { itemKey } = route.params;
+
+        const getUserData = async (userId) => {
+        try {
+        const userSnapshot = await database().ref(`/users/${userId}`).once('value');
+    return userSnapshot.val();
+  } catch (error) {
+        console.error('Erreur lors de la récupération des données utilisateur:', error);
+    return null;
+            }
+            };
+
+function FoodDetailScreen({ route, navigation }) {
+        const { itemKey } = route.params;
   const [food, setFood] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    const fetchFoodDetail = async () => {
-      try {
-        const documentSnapshot = await firestore().collection('plats').doc(itemKey).get();
-        if (documentSnapshot.exists) {
-          setFood(documentSnapshot.data());
+useEffect(() => {
+        const fetchInitialData = async () => {
+        try {
+        const user = auth().currentUser;
+        if (user) {
+        const foodDoc = await firestore().collection('plats').doc(itemKey).get();
+          if (foodDoc.exists) {
+        const foodData = foodDoc.data();
+            const fournisseurData = await getUserData(foodData.fournisseurId);
+            const fournisseurName = fournisseurData ? fournisseurData.fullName : 'Nom du fournisseur non disponible';
+setFood({ ...foodData, fournisseurName, fournisseurId: foodData.fournisseurId });
+        } else {
+        console.error('Plat non trouvé');
+          }
+
+                  const cartItemDoc = await firestore()
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .doc(itemKey)
+            .get();
+          if (cartItemDoc.exists) {
+        const initialQuantity = cartItemDoc.data().quantity;
+setQuantity(initialQuantity > 0 ? initialQuantity : 1);
+          }
+                  } else {
+                  console.error('Vous devez être connecté pour récupérer les données.');
         }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching food details:', error);
-        setLoading(false);
+                } catch (error) {
+        console.error('Erreur lors de la récupération des données:', error);
+      } finally {
+setLoading(false);
       }
-    };
-    fetchFoodDetail();
+              };
+
+fetchInitialData();
   }, [itemKey]);
 
-  const handleAddToCart = () => {
-    // Logique pour ajouter l'article au panier
-    Alert.alert("Succès", `${food.title} a été ajouté au panier.`);
-  };
+        const updateCartItemQuantity = async (newQuantity) => {
+        try {
+        const user = auth().currentUser;
+      if (user) {
+        const cartItemRef = firestore()
+          .collection('carts')
+          .doc(user.uid)
+          .collection('items')
+          .doc(itemKey);
 
-  const handleAddToFavorites = async () => {
-    try {
-      const favoritesString = await AsyncStorage.getItem('favorites');
-      const favorites = favoritesString ? JSON.parse(favoritesString) : [];
+await cartItemRef.set(
+{ quantity: newQuantity },
+        { merge: true }
+        );
 
-      if (!favorites.find(favorite => favorite.itemKey === itemKey)) {
-        favorites.push({ itemKey, title: food.title, price: food.price }); // Assurez-vous de stocker le prix
-        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
-        setIsFavorite(true);
-        Alert.alert('Succès', `${food.title} a été ajouté aux favoris.`);
+await axios.post(
+          `http://172.20.192.1:8080/api/carts/${user.uid}/${itemKey}?quantity=${newQuantity}`,
+{}
+        );
+
+setQuantity(newQuantity);  // Update local state after backend update
       } else {
-        Alert.alert('Info', `${food.title} est déjà dans vos favoris.`);
+              console.error('Vous devez être connecté pour mettre à jour la quantité.');
       }
-      console.log('Favorites:', favorites);
-    } catch (error) {
-      console.error('Error adding to favorites:', error);
-      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'ajout aux favoris.');
+              } catch (error) {
+        console.error('Erreur lors de la mise à jour de la quantité du panier:', error);
     }
+            };
+
+            const handleIncreaseQuantity = () => {
+        const newQuantity = quantity + 1;
+updateCartItemQuantity(newQuantity);
   };
 
+          const handleDecreaseQuantity = () => {
+        if (quantity > 1) {
+        const newQuantity = quantity - 1;
+updateCartItemQuantity(newQuantity);
+    }
+            };
 
-  if (loading) {
-    return (
+            const handleAddToCart = async () => {
+        try {
+        const user = auth().currentUser;
+      if (user) {
+        const cartItemRef = firestore()
+          .collection('carts')
+          .doc(user.uid)
+          .collection('items')
+          .doc(itemKey);
+
+await cartItemRef.set({
+    title: food?.title || "Titre non disponible",
+            price: food?.price || 0,
+            imageURL: food?.imageURL || "https://via.placeholder.com/250",
+            quantity: quantity,
+}, { merge: true });
+
+await axios.post('http://172.20.192.1:8080/api/carts', {
+    userId: user.uid,
+            itemKey: itemKey,
+            title: food?.title || "Titre non disponible",
+            price: food?.price || 0,
+            imageURL: food?.imageURL || "https://via.placeholder.com/250",
+            quantity: quantity,
+});
+
+        console.log('Article ajouté au panier');
+      } else {
+              console.error('Erreur', 'Vous devez être connecté pour ajouter un article au panier.');
+      }
+              } catch (error) {
+        console.error('Erreur lors de l\'ajout au panier:', error);
+    }
+            };
+
+            if (loading) {
+        return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
       </View>
-    );
-  }
-
-  if (!food) {
-    return (
+        );
+        }
+        if (!food) {
+        return (
       <View style={styles.loadingContainer}>
         <Text style={styles.errorText}>Plat non trouvé</Text>
       </View>
-    );
-  }
+        );
+        }
 
-  return (
+        return (
     <View style={styles.container}>
       <FoodDetailCard
-        image={food.imageURL}
-        title={food.title}
-        price={food.price}
-        description={food.description}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
-        <Text style={styles.buttonText}>Ajouter au panier</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleAddToFavorites}>
-        <Text style={styles.buttonText}>Ajouter aux favoris</Text>
-      </TouchableOpacity>
+image={food.imageURL}
+title={food.title}
+price={food.price}
+description={food.description}
+platDocId={itemKey}
+quantity={quantity}
+fournisseur={food.fournisseurName}
+fournisseurId={food.fournisseurId}
+onIncreaseQuantity={handleIncreaseQuantity}
+onDecreaseQuantity={handleDecreaseQuantity}
+onAddToCart={handleAddToCart}
+        />
     </View>
-  );
-}
+        );
+        }
+        const styles = StyleSheet.create({
+          container: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white', // Set the background color to green
+            padding : 10,
+          },
+          loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+          errorText: {
+            textAlign: 'center',
+            fontSize: 18,
+            color: 'red',
+          },
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#C7C8CC',
-    padding: 16,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: '#FF4B3A',
-    borderRadius: 15,
-    height: 50,
-    width: '94%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 7,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
-
+        });
 export default FoodDetailScreen;

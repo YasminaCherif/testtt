@@ -17,6 +17,7 @@ const SignInScreen = ({ navigation }) => {
   const [isFournisseur, setIsFournisseur] = useState(false);
   const [cinNumber, setCinNumber] = useState('');
   const [completeAddress, setCompleteAddress] = useState('');
+  const [fullName, setFullName] = useState(''); // Add state for full name
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -77,6 +78,7 @@ const SignInScreen = ({ navigation }) => {
       const userData = {
         email: email,
         phoneNumber: phoneNumber,
+        fullName: fullName, // Include full name in the user data
         role: isFournisseur ? 'fournisseur' : 'client',
       };
 
@@ -106,8 +108,16 @@ const SignInScreen = ({ navigation }) => {
         <Text style={styles.title}>S'inscrire</Text>
         <TextInput
           style={styles.input}
+          placeholder="Nom complet"
+          onChangeText={setFullName}
+          placeholderTextColor="gray"
+          value={fullName}
+        />
+        <TextInput
+          style={styles.input}
           placeholder="Email"
           keyboardType="email-address"
+          placeholderTextColor="gray"
           onChangeText={setEmail}
           value={email}
         />
@@ -115,6 +125,7 @@ const SignInScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Mot de passe"
           secureTextEntry={true}
+          placeholderTextColor="gray"
           onChangeText={setPassword}
           value={password}
         />
@@ -123,6 +134,7 @@ const SignInScreen = ({ navigation }) => {
           placeholder="Confirmer le mot de passe"
           secureTextEntry={true}
           onChangeText={setConfirmPassword}
+          placeholderTextColor="gray"
           value={confirmPassword}
         />
         <TextInput
@@ -130,6 +142,7 @@ const SignInScreen = ({ navigation }) => {
           placeholder="Numéro de téléphone"
           keyboardType="phone-pad"
           onChangeText={setPhoneNumber}
+          placeholderTextColor="gray"
           value={phoneNumber}
         />
         <View style={styles.checkboxContainer}>
@@ -146,12 +159,14 @@ const SignInScreen = ({ navigation }) => {
               style={styles.input}
               placeholder="Numéro de la CIN"
               onChangeText={setCinNumber}
+              placeholderTextColor="gray"
               value={cinNumber}
             />
             <TextInput
               style={styles.input}
               placeholder="Adresse complète"
               onChangeText={setCompleteAddress}
+              placeholderTextColor="gray"
               value={completeAddress}
             />
           </>
@@ -196,6 +211,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     borderRadius: 10,
     fontFamily: 'Raleway-Medium',
+    color:'black',
   },
   logo: {
     marginLeft: 20,
@@ -265,6 +281,7 @@ const styles = StyleSheet.create({
   label: {
     margin: 8,
     fontFamily: 'Raleway-Medium',
+    color:'black',
   },
 });
 

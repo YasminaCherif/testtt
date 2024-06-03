@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native';
-import { ScrollView } from 'react-native-virtualized-view';
+import { StyleSheet, View, ActivityIndicator, FlatList, Image, TouchableOpacity, ScrollView, Button } from 'react-native';
 import MyView from '../components/MyView';
 import MyText from '../components/MyText';
 import Search from '../components/Search';
 import Category from '../components/Category';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import axios from 'axios';
+import PlatRow from '../components/PlatRow';
 import FoodCard from '../components/FoodCard';
-import AddPlat from '../components/AddPlat';
 import DashboardIcon from './../../assets/images/dashbord.png';
-import CartIcon from './../../assets/images/panier.png';
+import CartIcon from './../../assets/images/offres.png';
 
 function HomeScreenFournisseur({ navigation }) {
     const [loading, setLoading] = useState(true);
@@ -18,6 +19,17 @@ function HomeScreenFournisseur({ navigation }) {
     const [foods, setFoods] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [plats, setPlats] = useState([]);
+    const [fournisseurId, setFournisseurId] = useState(null);
+
+    useEffect(() => {
+        const fetchFournisseurId = async () => {
+            const currentUser = auth().currentUser;
+            if (currentUser) {
+                setFournisseurId(currentUser.uid);
+            }
+        };
+        fetchFournisseurId();
+    }, []);
 
     useEffect(() => {
         const subscriber = firestore()
@@ -67,44 +79,97 @@ function HomeScreenFournisseur({ navigation }) {
         return () => subscriber();
     }, []);
 
-    const navigateToDashboard = () => {
-        navigation.navigate('Dashboard');
-    };
-
-    const navigateToCart = () => {
-        navigation.navigate('cart'); // Make sure the route name is 'Cart'
-    };
-
-    const navigateToAddPlat = () => {
-            navigation.navigate('AddPlat'); // Remplacez 'AddPlat' par le nom de votre vue pour ajouter un plat
-        };
+    useEffect(() => {
+        if (fournisseurId) {
+            const fetchPlats = async () => {
+                try {
+                    const querySnapshot = await firestore()
+                        .collection('plats')
+                        .where('fournisseurId', '==', fournisseurId)
+                        .get();
+                    const plats = [];
+                    querySnapshot.forEach(documentSnapshot => {
+                        plats.push({
+                            ...documentSnapshot.data(),
+                            key: documentSnapshot.id,
+                        });
+                    });
+                    setPlats(plats);
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error fetching plats:', error);
+                }
+            };
+            fetchPlats();
+        }
+    }, [fournisseurId]);
 
     const getPlatsByCategory = async (categoryId) => {
         try {
-            console.log("Fetching plats for category:", categoryId);
-            const querySnapshot = await firestore()
-                .collection('plats')
-                .where('categoryId', '==', categoryId)
-                .get();
+            if (fournisseurId) {
+                console.log("Fetching plats for category:", categoryId);
+                const querySnapshot = await firestore()
+                    .collection('plats')
+                    .where('categoryId', '==', categoryId)
+                    .where('fournisseurId', '==', fournisseurId)
+                    .get();
 
-            const plats = [];
-            querySnapshot.forEach(documentSnapshot => {
-                plats.push({
-                    ...documentSnapshot.data(),
-                    key: documentSnapshot.id,
+                const plats = [];
+                querySnapshot.forEach(documentSnapshot => {
+                    plats.push({
+                        ...documentSnapshot.data(),
+                        key: documentSnapshot.id,
+                    });
                 });
-            });
-            console.log("Plats fetched for category:", categoryId, plats);
-            setPlats(plats);
+                console.log("Plats fetched for category:", categoryId, plats);
+                setPlats(plats);
+            }
         } catch (error) {
             console.error('Error fetching plats by category:', error);
         }
     };
 
-    const handleCategorySelect = (key: string) => {
+    const handleCategorySelect = (key) => {
         console.log("Selected category:", key);
         setSelectedCategory(key);
-        getPlatsByCategory(key);
+        if (key === null) {
+            fetchPlats();
+        } else {
+            getPlatsByCategory(key);
+        }
+    };
+
+    const deletePlat = async (itemId) => {
+        try {
+            await axios.delete(`http://192.168.1.169:8080/plats/delete?document_id=${itemId}`);
+            setPlats((prevPlats) => prevPlats.filter(plat => plat.key !== itemId));
+        } catch (error) {
+            console.error("Error deleting plat: ", error);
+        }
+    };
+
+    const updatePlat = async (itemId) => {
+        try {
+            navigation.navigate('ModifierPlat', { platId: itemId });
+        } catch (error) {
+            console.error("Erreur lors de la navigation vers le formulaire de modification : ", error);
+        }
+    };
+
+    const navigateToDashboard = () => {
+        navigation.navigate('Dashboard');
+    };
+
+    const navigateToCart = () => {
+        navigation.navigate('notification');
+    };
+
+    const navigateToAddPlat = () => {
+        navigation.navigate('AddPlat');
+    };
+
+    const navigateToAddCategory = () => {
+        navigation.navigate('AddCategory');
     };
 
     if (loading) {
@@ -114,7 +179,6 @@ function HomeScreenFournisseur({ navigation }) {
     return (
         <ScrollView style={styles.scrollView}>
             <MyView style={styles.con}>
-
                 <View style={styles.header}>
                     <TouchableOpacity onPress={navigateToDashboard}>
                         <Image source={DashboardIcon} style={styles.icon} />
@@ -125,7 +189,7 @@ function HomeScreenFournisseur({ navigation }) {
                     </TouchableOpacity>
                 </View>
                 <View>
-                    <MyText style={styles.headerText}>salam founisseur</MyText>
+                    <MyText style={styles.headerText}>salam fournisseur</MyText>
                 </View>
 
                 <Search />
@@ -147,25 +211,21 @@ function HomeScreenFournisseur({ navigation }) {
                     />
                 </View>
                 <TouchableOpacity onPress={navigateToAddPlat}>
-                                                <View style={styles.addPlatButton}>
-                                                    <MyText style={styles.addPlatButtonText}>Ajouter un plat</MyText>
-                                                </View>
-                                            </TouchableOpacity>
-                <View style={{ marginTop: -68 }}>
-                    <MyText style={styles.text}> </MyText>
-                    <FlatList
-                        vertical
-                        data={plats}
-                        renderItem={({ item }) => (
-                            <FoodCard
-                                image={item.imageURL}
-                                title={item.title}
-                                price={item.price}
-                                itemKey={item.key}
-                            />
-                        )}
-                        showsHorizontalScrollIndicator={false}
-                    />
+                    <View style={styles.addPlatButton}>
+                        <MyText style={styles.addPlatButtonText}>Ajouter DES platS</MyText>
+                    </View>
+                </TouchableOpacity>
+
+                <View style={{ marginTop: 20 }}>
+                    <MyText style={styles.text}>Liste des Plats</MyText>
+                    {plats.map(plat => (
+                        <PlatRow
+                            key={plat.key}
+                            plat={plat}
+                            onDelete={deletePlat}
+                            onUpdate={updatePlat}
+                        />
+                    ))}
                 </View>
                 <View style={styles.alo}>
                     <MyText style={styles.text}>Les plus populaires </MyText>
@@ -236,19 +296,19 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     addPlatButton: {
-            backgroundColor: '#FF4B3A',
-            paddingVertical: 15,
-            paddingHorizontal: 10,
-            borderRadius: 5,
-            marginTop: 10,
-            marginLeft: 15,
-            marginRight: 15,
-        },
-        addPlatButtonText: {
-                color: '#FFFFFF',
-                fontSize: 16,
-                fontWeight: 'bold',
-            },
+        backgroundColor: '#FF4B3A',
+        paddingVertical: 15,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        marginLeft: 15,
+        marginRight: 15,
+    },
+    addPlatButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     headerText: {
         flex: 1,
         marginLeft: 21,
