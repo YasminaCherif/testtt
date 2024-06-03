@@ -40,7 +40,13 @@ const Commandes = () => {
             statusClient = 'Commande Livrée';
           }
 
-          return { id: doc.id, ...data, statusClient };
+          // Add itemKey if it does not exist
+          const items = data.items.map(item => ({
+            ...item,
+            itemKey: item.itemKey || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Generate a unique id if itemKey does not exist
+          }));
+
+          return { id: doc.id, ...data, items, statusClient };
         });
 
         setOrders(ordersData);
@@ -72,8 +78,14 @@ const Commandes = () => {
         throw new Error('User not authenticated');
       }
 
-      const platId = currentOrder.items[0].itemKey;
-      const fournisseurId = currentOrder.items[0].fournisseurId;
+      const item = currentOrder.items[0];
+      console.log('item:', item); // Log pour vérifier l'élément complet
+
+      const platId = item?.itemKey;
+      const fournisseurId = item?.fournisseurId;
+
+      console.log('platId:', platId);  // Log pour vérifier platId
+      console.log('fournisseurId:', fournisseurId);  // Log pour vérifier fournisseurId
 
       if (!platId || !fournisseurId) {
         throw new Error('Invalid platId or fournisseurId');
