@@ -27,6 +27,7 @@ function HomeScreen({ navigation }) {
     const [searchResults, setSearchResults] = useState([]);
     const [numberOfItemsInCart, setNumberOfItemsInCart] = useState(0);
     const [mostPurchasedPlats, setMostPurchasedPlats] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null); // Ajout de l'état currentUser
 
     const getUserData = async (userId) => {
         try {
@@ -39,6 +40,7 @@ function HomeScreen({ navigation }) {
 
     useEffect(() => {
         const unsubscribe = auth().onAuthStateChanged(async (user) => {
+            setCurrentUser(user); // Mettez à jour l'état currentUser
             if (user) {
                 const userData = await getUserData(user.uid);
                 if (userData) {
@@ -54,24 +56,46 @@ function HomeScreen({ navigation }) {
     }, []);
 
     useEffect(() => {
-        const subscriber = firestore()
-            .collection('categories')
-            .onSnapshot(querySnapshot => {
-                const categories = [];
-                querySnapshot.forEach(documentSnapshot => {
-                    categories.push({
-                        ...documentSnapshot.data(),
-                        key: documentSnapshot.id,
+        if (currentUser) {
+            const subscriber = firestore()
+                .collection('categories')
+                .onSnapshot(querySnapshot => {
+                    const categories = [];
+                    querySnapshot.forEach(documentSnapshot => {
+                        categories.push({
+                            ...documentSnapshot.data(),
+                            key: documentSnapshot.id,
+                        });
                     });
+                    setCategories(categories);
+                    setLoading(false);
                 });
-                setCategories(categories);
-                setLoading(false);
-            });
-        return () => subscriber();
-    }, []);
+            return () => subscriber();
+        }
+    }, [currentUser]);
 
+    useEffect(() => {
+        if (currentUser) {
+            const unsubscribe = firestore()
+                .collection('plats')
+                .onSnapshot(querySnapshot => {
+                    const plats = [];
+                    querySnapshot.forEach(async documentSnapshot => {
+                        const platData = documentSnapshot.data();
+                        const fournisseurData = await getUserData(platData.fournisseurId);
+                        plats.push({
+                            ...platData,
+                            key: documentSnapshot.id,
+                            fournisseur: fournisseurData ? fournisseurData.fullName : 'Unknown',
+                            fournisseurId: platData.fournisseurId,
+                        });
+                    });
+                    setPlats(plats);
+                });
 
-
+            return () => unsubscribe();
+        }
+    }, [currentUser]);
 
     const navigateToDashboard = () => {
         navigation.navigate('Dashboard');
@@ -86,8 +110,6 @@ function HomeScreen({ navigation }) {
     };
 
     useEffect(() => {
-        const currentUser = auth().currentUser;
-
         if (currentUser) {
             const userCartRef = firestore().collection('carts').where('userId', '==', currentUser.uid);
 
@@ -99,7 +121,13 @@ function HomeScreen({ navigation }) {
         } else {
             setNumberOfItemsInCart(0);
         }
-    }, []);
+    }, [currentUser]);
+
+    useEffect(() => {
+        if (currentUser) {
+            fetchMostPurchasedPlats();
+        }
+    }, [currentUser]);
 
     const fetchMostPurchasedPlats = async () => {
         try {
@@ -145,13 +173,13 @@ function HomeScreen({ navigation }) {
         }
     };
 
-    useEffect(() => {
-        fetchMostPurchasedPlats();
-    }, []);
+    const handleCategorySelect = (key) => {
+        setSelectedCategory(key);
+        getPlatsByCategory(key);
+    };
 
     const getPlatsByCategory = async (categoryId) => {
         try {
-            console.log("Fetching plats for category:", categoryId);
             const querySnapshot = await firestore()
                 .collection('plats')
                 .where('categoryId', '==', categoryId)
@@ -170,17 +198,10 @@ function HomeScreen({ navigation }) {
                 })
             );
 
-            console.log("Plats fetched for category:", categoryId, plats);
             setPlats(plats);
         } catch (error) {
             console.error('Error fetching plats by category:', error);
         }
-    };
-
-    const handleCategorySelect = (key) => {
-        console.log("Selected category:", key);
-        setSelectedCategory(key);
-        getPlatsByCategory(key);
     };
 
     if (loading) {
@@ -188,7 +209,6 @@ function HomeScreen({ navigation }) {
     }
 
     const handleSearch = (searchResults) => {
-        console.log('Search results:', searchResults);
         navigation.navigate('SearchResultsPage', { searchResults });
     };
 

@@ -129,7 +129,7 @@ const DashboardFourScreen = () => {
         <Text style={styles.commandeTitle}>Commande #{item.id}</Text>
         <Text style={styles.commandeDate}>{item.createdAt.toDate().toLocaleDateString()}</Text>
       </View>
-      <Text style={styles.commandeDetail}>Montant Total: {item.totalPrice} €</Text>
+      <Text style={styles.commandeDetail}>Montant Total: {item.totalPrice} MAD</Text>
       <Text style={styles.commandeDetail}>Adresse: {item.address}</Text>
       <TouchableOpacity onPress={() => navigation.navigate('DetailsCommandeFour', { commande: item })}>
         <Text style={styles.detailsButton}>Détails</Text>

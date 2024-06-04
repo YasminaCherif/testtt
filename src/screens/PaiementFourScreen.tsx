@@ -34,7 +34,7 @@ const PaiementFourScreen = () => {
   const renderTransaction = ({ item }) => (
     <View style={styles.transactionCard}>
       <Text style={styles.transactionText}>ID de la Commande: {item.id}</Text>
-      <Text style={styles.transactionText}>Montant Total: {item.totalPrice} €</Text>
+      <Text style={styles.transactionText}>Montant Total: {item.totalPrice} MAD</Text>
       <Text style={styles.transactionText}>Date: {item.createdAt.toDate().toLocaleDateString()}</Text>
     </View>
   );
@@ -42,7 +42,7 @@ const PaiementFourScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Transactions et Paiements</Text>
-      <Text style={styles.totalBalance}>Solde Total: {totalBalance} €</Text>
+      <Text style={styles.totalBalance}>Solde Total: {totalBalance} MAD</Text>
       <FlatList
         data={transactions}
         keyExtractor={(item) => item.id}
