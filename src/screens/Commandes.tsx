@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Modal from 'react-native-modal';
+import backIcon2 from './../../assets/images/back.png'; // Assuming you have back icon in this path
 
-const Commandes = () => {
+const Commandes = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -114,6 +115,14 @@ const Commandes = () => {
     }
   };
 
+  const handleRecommander = (order) => {
+    navigation.navigate('pay', {
+      amount: order.totalPrice,
+      items: order.items,
+      userId: order.userId,
+    });
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -122,23 +131,46 @@ const Commandes = () => {
     );
   }
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Commande en cours de traitement':
+        return '#FFA500'; // Orange
+      case 'En cours de préparation':
+        return '#1E90FF'; // Blue
+      case 'Commande refusée':
+        return '#FF4500'; // Red
+      case 'Commande Livrée':
+        return '#32CD32'; // Green
+      default:
+        return '#333'; // Default color
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerTitle}>Suivi de commande</Text>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Welcome')}>
+            <Image source={backIcon2} style={styles.backIcon} />
+          </TouchableOpacity>
+        </View>
         {orders.length === 0 ? (
           <Text style={styles.emptyText}>Aucune commande trouvée.</Text>
         ) : (
           <View>
             {orders.map(order => (
               <View key={order.id} style={styles.orderContainer}>
-                <Text style={styles.orderStatus}>Statut: {order.statusClient}</Text>
-                <Text style={styles.orderText}>Plats commandés :</Text>
+                <Text style={[styles.orderStatus, { color: getStatusColor(order.statusClient) }]}>{order.statusClient}</Text>
                 <View style={styles.itemsContainer}>
                   {order.items.map((item, index) => (
                     <View key={index} style={styles.itemContainer}>
-                      <Text style={styles.itemTitle}>{item.title}</Text>
-                      <Text style={styles.itemText}>Quantité: {item.quantity}</Text>
-                      <Text style={styles.itemText}>Prix: {item.price} dh</Text>
+                      <Image source={{ uri: item.imageURL }} style={styles.itemImage} />
+                      <View style={styles.itemDetails}>
+                        <Text style={styles.itemTitle}>{item.title}</Text>
+                        <Text style={styles.itemText}>Quantité: {item.quantity}</Text>
+                        <Text style={styles.itemText}>Prix: {item.price} dh</Text>
+                      </View>
                     </View>
                   ))}
                 </View>
@@ -148,6 +180,14 @@ const Commandes = () => {
                     onPress={() => handleRateOrder(order)}
                   >
                     <Text style={styles.rateButtonText}>Noter le Fournisseur</Text>
+                  </TouchableOpacity>
+                )}
+                {order.statusClient === 'Commande Livrée' && (
+                  <TouchableOpacity
+                    style={styles.recommanderButton}
+                    onPress={() => handleRecommander(order)}
+                  >
+                    <Text style={styles.recommanderButtonText}>Recommander</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -195,6 +235,25 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingVertical: 20,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  backButton: {
+    padding: 10,
+  },
+  backIcon: {
+    width: 35,
+    height: 35,
+    transform: [{ rotate: '180deg' }],
+  },
   emptyText: {
     textAlign: 'center',
     marginTop: 20,
@@ -202,9 +261,9 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   orderContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 15,
+    padding: 20,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -215,38 +274,64 @@ const styles = StyleSheet.create({
   orderStatus: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF4B3A',
     marginBottom: 10,
   },
   orderText: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'black',
+    color: '#333',
   },
   itemsContainer: {
     marginLeft: 10,
   },
   itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    shadowColor: '#ccc',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  itemImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 5,
+    marginRight: 10,
   },
   itemTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#555',
   },
   itemText: {
     fontSize: 14,
-    color: 'gray',
+    color: '#777',
   },
   rateButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#FF4B3A',
+    backgroundColor: '#FF6347',
     borderRadius: 5,
     alignItems: 'center',
   },
   rateButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  recommanderButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#32CD32',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  recommanderButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },
@@ -260,6 +345,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: '#FF4B3A',
   },
   input: {
     height: 40,
@@ -271,15 +357,13 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#FF4B3A',
-    height: 50,
+    padding: 10,
+    borderRadius: 5,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30,
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 20,
   },
 });
 

@@ -70,36 +70,8 @@ function HomeScreen({ navigation }) {
         return () => subscriber();
     }, []);
 
-    useEffect(() => {
-        const subscriber = firestore().collection("foods").onSnapshot((res) => {
-            const foods = [];
-            res.forEach(documentSnapshot => {
-                foods.push({
-                    ...documentSnapshot.data(),
-                    key: documentSnapshot.id,
-                });
-            });
-            setFoods(foods);
-        });
-        return () => subscriber();
-    }, []);
 
-    useEffect(() => {
-        const subscriber = firestore()
-            .collection('promotions')
-            .onSnapshot(querySnapshot => {
-                const promotions = [];
-                querySnapshot.forEach(documentSnapshot => {
-                    promotions.push({
-                        ...documentSnapshot.data(),
-                        key: documentSnapshot.id,
-                    });
-                });
-                setPromotions(promotions);
-                setLoading(false);
-            });
-        return () => subscriber();
-    }, []);
+
 
     const navigateToDashboard = () => {
         navigation.navigate('Dashboard');
